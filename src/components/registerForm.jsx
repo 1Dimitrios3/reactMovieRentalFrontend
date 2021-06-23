@@ -1,6 +1,7 @@
 import React from 'react';
 import Form from './common/form';
 import Joi from 'joi-browser';
+import * as userService from '../services/userService';
 
 class RegisterForm extends Form {
     state = { 
@@ -13,16 +14,25 @@ class RegisterForm extends Form {
         errors: {}
      };
 
-     doSubmit = () => {
-         // Call Server
-         console.log('Submitted!');
-     }
-
      schema = {
         firstName: Joi.string().required().min(3).label('Fist Name'),
         lastName: Joi.string().required().min(3).label('Last Name'),
         email: Joi.string().email().required().max(256).label('Email'),
         password: Joi.string().required().regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/).label('Password')
+    }
+
+    doSubmit = async () => {
+        try {
+            await userService.register(this.state.data)
+            this.props.history.push('/login');
+
+        } catch (ex) {
+            if(ex.response && ex.response.status === 400) {
+                const errors = {...this.state.errors};
+                errors.email = ex.response.data;
+                this.setState({ errors });
+            }
+        }
     }
 
     render() { 
