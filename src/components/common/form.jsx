@@ -18,9 +18,8 @@ class Form extends Component {
         const errors = {};
         for (let item of error.details) { 
             errors[item.path[0]] = item.message;
+            return errors;
         };
-
-        return errors;
     };
 
     validateProperty = ({ name, value }) => {
